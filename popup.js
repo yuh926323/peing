@@ -11,5 +11,8 @@ let csrf_token = document.querySelector('input[name="authenticity_token"]').valu
         </div>
     </form>
     </div>
-</div>`;
-document.querySelector('.answer-form-area').innerHTML = areaDOM;
+</div>`,
+    answerArea = document.querySelector('.answer-form-area');
+if (answerArea && csrf_token && uuid) {
+    answerArea.innerHTML = areaDOM;
+}
