@@ -36,9 +36,9 @@ class PeingReply {
         return ele ? ele.value : null;
     }
 
-    getPageInfo() {
+    getPageInfo(url = '') {
         let pattern = /https:\/\/peing\.net\/(ja|en|zh-cn|zh-tw)\/q\/([a-z0-9-]{36})\?v=([0-9])+/gi;
-        return pattern.exec(location.href);
+        return pattern.exec(url ? url : location.href);
     }
 
     generateAnswerArea(params) {
