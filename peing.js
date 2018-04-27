@@ -58,3 +58,104 @@ class PeingReply {
 }
 
 let peingReply = new PeingReply();
+
+class PeingViewer {
+    constructor() {
+        let questions = document.querySelectorAll('.question-box.js-question-update, .question-box-link');
+        if (! questions.length) {
+            return;
+        }
+
+        let reply = document.createElement('style');
+        reply.type = 'text/css';
+        reply.innerHTML = `.reply-area {
+            width: 90%;
+            min-height: 30px;
+            background-color: #eee;
+            border-radius: 10px;
+            margin-left: auto;
+            margin-top: 10px;
+            padding: 10px;
+        }
+        .reply-title {
+            color: #999;
+                font-size: 12px;
+                }
+        .reply-title i{
+            font-size: 10px;
+            padding-right: 4px;
+            color: #bbb;
+        }
+        .reply-content {
+            margin-top: 5px;
+            font-size: 14px;
+            line-height: 22px;
+            color: #2248a9;
+        }
+
+        .reply-area textarea {
+            height: 100px;
+            margin-top: 10px;
+        }
+        .reply-area .submit-button {
+            padding-top: 10px;
+            padding-bottom: 5px;
+        }
+        .reply-area .c-twitter-linked-form {
+            padding: 0 10px;
+        }
+        `;
+        document.head.appendChild(reply);
+
+        questions.forEach((ele) => {
+            let request = new Request(this.getQuestionLink(ele));
+            fetch(request).then((results) => {
+                results.text().then((str) => {
+                    let responseDoc = new DOMParser().parseFromString(str, 'text/html'),
+                        answer = responseDoc.querySelector('.answer'),
+                        replyArea;
+                    if (answer) {
+                        replyArea = `<div class="reply-area">
+                            <div class="reply-title"><i class="fa fa-reply"></i>箱主回覆</div>
+                            <div class="reply-content">${answer.innerText}</div>
+                        </div>`;
+                    } else {
+                        let csrf_token = document.head.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            result = peingReply.getPageInfo(this.getQuestionLink(ele)),
+                            language,
+                            uuid,
+                            version;
+                        [, language, uuid, version] = result;
+
+                        let params = {
+                            'csrf_token' : csrf_token,
+                            'language' : language,
+                            'uuid' : uuid,
+                            'version' : version,
+                        };
+                        replyArea = `<div class="reply-area">
+                            <div class="reply-title"><i class="fa fa-reply"></i>這則問題還沒有被回答，在這邊直接回應</div>
+                            ${peingReply.generateAnswerArea(params)}
+                        </div>`;
+                    }
+                    this.appendToReplyArea(ele, replyArea);
+                });
+            });
+        });
+
+    }
+
+    getQuestionLink(ele) {
+        return ele.className === 'question-box-link' ? ele.href : ele.children[2].href;
+    }
+
+    appendToReplyArea(ele, replyArea) {
+        if (ele.className === 'question-box-link') {
+            ele.children[0].innerHTML += replyArea;
+        } else {
+            ele.innerHTML += replyArea;
+        }
+    }
+}
+
+new PeingViewer();
