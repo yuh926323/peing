@@ -23,7 +23,7 @@
             "https://peing.net/*"
         ],
         "js": [
-            "popup.js"
+            "peing.js"
         ]
     }]
 }
