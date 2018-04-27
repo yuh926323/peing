@@ -3,7 +3,7 @@
     "short_name": "Peing Reply",
     "name": "Peing 提問箱 - 自動產生回應區塊",
     "description": "這個插件可以幫助你在問題頁面長出回應框。",
-    "version": "2.0",
+    "version": "3.0",
     "permissions": [
         "activeTab"
     ],
