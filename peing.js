@@ -1,4 +1,4 @@
-class Peing {
+class PeingReply {
     constructor() {
         let result = this.getPageInfo(),
             language,
@@ -57,4 +57,4 @@ class Peing {
     }
 }
 
-new Peing();
+let peingReply = new PeingReply();
