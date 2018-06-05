@@ -3,7 +3,6 @@ class PeingReply {
         let result = this.getPageInfo(),
             language,
             uuid,
-            version,
             csrf_token,
             answerArea;
 
@@ -11,7 +10,7 @@ class PeingReply {
             return;
         }
         // the same php list() function
-        [, language, uuid, version] = result;
+        [, language, uuid] = result;
 
         csrf_token = this.getElementValue('input[name="authenticity_token"]');
         if (! csrf_token) {
@@ -27,7 +26,6 @@ class PeingReply {
             'csrf_token' : csrf_token,
             'language' : language,
             'uuid' : uuid,
-            'version' : version,
         });
     }
 
@@ -37,14 +35,14 @@ class PeingReply {
     }
 
     getPageInfo(url = '') {
-        let pattern = /https:\/\/peing\.net\/(ja|en|zh-cn|zh-tw)\/q\/([a-z0-9-]{36})\?v=([0-9])+/gi;
+        let pattern = /https:\/\/peing\.net\/(ja|en|zh-cn|zh-tw)\/q\/([a-z0-9-]{36})/gi;
         return pattern.exec(url ? url : location.href);
     }
 
     generateAnswerArea(params) {
         return `<div class="answer-form-area">
         <div class="c-twitter-linked-form">
-        <form class="js-question-form" action="/${params['language']}/q/${params['uuid']}/answer?v=${params['version']}" accept-charset="UTF-8" method="post">
+        <form class="js-question-form" action="/${params['language']}/q/${params['uuid']}/answer}" accept-charset="UTF-8" method="post">
             <input name="utf8" type="hidden" value="✓">
             <input type="hidden" name="authenticity_token" value="${params['csrf_token']}">
             <textarea id="answer_body" style="" name="answer[body]"></textarea>
@@ -123,15 +121,13 @@ class PeingViewer {
                         let csrf_token = document.head.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                             result = peingReply.getPageInfo(this.getQuestionLink(ele)),
                             language,
-                            uuid,
-                            version;
-                        [, language, uuid, version] = result;
+                            uuid;
+                        [, language, uuid] = result;
 
                         let params = {
                             'csrf_token' : csrf_token,
                             'language' : language,
                             'uuid' : uuid,
-                            'version' : version,
                         };
                         replyArea = `<div class="reply-area">
                             <div class="reply-title"><i class="fa fa-reply"></i>這則問題還沒有被回答，在這邊直接回應</div>
