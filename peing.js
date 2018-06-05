@@ -119,7 +119,8 @@ class PeingViewer {
                         </div>`;
                     } else {
                         let csrf_token = document.head.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            result = peingReply.getPageInfo(this.getQuestionLink(ele)),
+                            aLink = ele.querySelector('a'),
+                            result = peingReply.getPageInfo(aLink.href),
                             language,
                             uuid;
                         [, language, uuid] = result;
