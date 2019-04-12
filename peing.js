@@ -55,7 +55,7 @@ class PeingReply {
     }
 }
 
-let peingReply = new PeingReply();
+// let peingReply = new PeingReply();
 
 class PeingViewer {
     constructor() {
