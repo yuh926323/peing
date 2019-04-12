@@ -59,11 +59,6 @@ class PeingReply {
 
 class PeingViewer {
     constructor() {
-        let questions = document.querySelectorAll('.question-box.js-question-update, .question-box-link');
-        if (! questions.length) {
-            return;
-        }
-
         let reply = document.createElement('style');
         reply.type = 'text/css';
         reply.innerHTML = `.reply-area {
@@ -102,8 +97,49 @@ class PeingViewer {
         .reply-area .c-twitter-linked-form {
             padding: 0 10px;
         }
+
+        .answer-item > .box-background {
+            top: inherit !important;
+        }
         `;
         document.head.appendChild(reply);
+
+        this.generateReplayArea();
+
+        const self = this;
+        const listener = document.querySelector('.container.tab');
+        if (listener) {
+            const MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+            if (MutationObserver) {
+                const MutationObserverConfig = {
+                    childList: true,
+                    subtree: true,
+                    characterData: true
+                };
+                const observer = new MutationObserver(function (mutations) {
+                    self.generateReplayArea();
+                });
+                observer.observe(listener, MutationObserverConfig);
+            } else if (listener.addEventListener) {
+                listener.addEventListener('DOMSubtreeModified', function(evt) {
+                    self.generateReplayArea();
+                }, false);
+            } else {
+                console.log('unsupported generate replay area browser');
+            }
+        }
+    }
+
+    generateReplayArea() {
+        let answers = document.querySelectorAll('.reply-area');
+        if (answers.length) {
+            return;
+        }
+
+        let questions = document.querySelectorAll('.answer-list a, .question-box-link');
+        if (! questions.length) {
+            return;
+        }
 
         questions.forEach((ele) => {
             let request = new Request(this.getQuestionLink(ele));
@@ -117,40 +153,22 @@ class PeingViewer {
                             <div class="reply-title"><i class="fa fa-reply"></i>箱主回覆</div>
                             <div class="reply-content">${answer.innerText}</div>
                         </div>`;
-                    } else {
-                        let csrf_token = document.head.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            aLink = ele.querySelector('a'),
-                            result = peingReply.getPageInfo(aLink.href),
-                            language,
-                            uuid;
-                        [, language, uuid] = result;
-
-                        let params = {
-                            'csrf_token' : csrf_token,
-                            'language' : language,
-                            'uuid' : uuid,
-                        };
-                        replyArea = `<div class="reply-area">
-                            <div class="reply-title"><i class="fa fa-reply"></i>這則問題還沒有被回答，在這邊直接回應</div>
-                            ${peingReply.generateAnswerArea(params)}
-                        </div>`;
                     }
                     this.appendToReplyArea(ele, replyArea);
                 });
             });
         });
-
     }
 
     getQuestionLink(ele) {
-        return ele.className === 'question-box-link' ? ele.href : ele.children[2].href;
+        return ele.href;
     }
 
     appendToReplyArea(ele, replyArea) {
         if (ele.className === 'question-box-link') {
             ele.children[0].innerHTML += replyArea;
         } else {
-            ele.innerHTML += replyArea;
+            ele.parentElement.innerHTML += replyArea;
         }
     }
 }
